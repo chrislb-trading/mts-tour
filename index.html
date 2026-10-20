@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MTS Interactive Tour</title>
+<style>
+  :root { --bg:#0b0e13; --pan:#141922; --line:#273040; --fg:#e6e8eb; --mut:#929aa6; --acc:#e0a63a; --hot:rgba(224,166,58,.9); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif; }
+  header { padding:18px 20px 10px; max-width:1700px; margin:0 auto; }
+  h1 { margin:0; font-size:22px; font-weight:600; letter-spacing:.2px; }
+  h1 span { color:var(--acc); }
+  header p { margin:4px 0 0; color:var(--mut); max-width:900px; }
+  .wrap { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:16px; padding:10px 20px 30px; max-width:1700px; margin:0 auto; }
+  .stage { position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--line); align-self:start; }
+  .stage img { display:block; width:100%; height:auto; }
+  .hs { position:absolute; border:1.5px solid rgba(224,166,58,.35); border-radius:4px; cursor:pointer; transition:border-color .2s, background .2s; }
+  .hs:hover, .hs.on { border-color:var(--hot); background:rgba(224,166,58,.10); }
+  .hs.on { box-shadow:0 0 0 2px rgba(224,166,58,.35); }
+  .hs i { position:absolute; top:-9px; left:-9px; width:18px; height:18px; border-radius:50%; background:var(--acc); color:#111; font:700 11px/18px sans-serif; text-align:center; font-style:normal; }
+  .hs.tip::after { content:attr(data-t); position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:rgba(11,14,19,.9); color:var(--fg); padding:3px 8px; border-radius:4px; font-size:12px; white-space:nowrap; opacity:0; transition:opacity .2s; pointer-events:none; }
+  .hs.tip:hover::after { opacity:1; }
+  .stage.pulse .hs { animation:pl 1.6s ease-in-out 2; }
+  @keyframes pl { 50% { border-color:var(--hot); background:rgba(224,166,58,.12); } }
+  aside { background:var(--pan); border:1px solid var(--line); border-radius:8px; padding:16px 18px; align-self:start; position:sticky; top:12px; max-height:calc(100vh - 24px); overflow:auto; }
+  aside h2 { margin:0 0 2px; font-size:19px; font-weight:600; }
+  aside .tag { display:inline-block; font-size:12px; color:#111; background:var(--acc); border-radius:3px; padding:0 6px; margin-left:6px; vertical-align:middle; }
+  aside .zoom { width:100%; border-radius:6px; border:1px solid var(--line); margin:10px 0 6px; background-repeat:no-repeat; background-color:#000; }
+  aside h3 { margin:14px 0 2px; font-size:13px; text-transform:uppercase; letter-spacing:.6px; color:var(--acc); font-weight:600; }
+  aside p, aside li { margin:0; color:#d3d7dc; }
+  aside code { display:block; background:#0d1117; border:1px solid var(--line); border-radius:4px; padding:6px 8px; margin:4px 0; font-size:12.5px; color:var(--acc); white-space:normal; }
+  aside ul { margin:4px 0 0; padding-left:18px; }
+  .nav { display:flex; justify-content:space-between; margin-top:16px; gap:8px; }
+  button { background:#1d2430; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:6px 12px; cursor:pointer; font:inherit; font-size:14px; }
+  button:hover { border-color:var(--acc); }
+  footer { color:var(--mut); font-size:12px; text-align:center; padding:0 20px 24px; }
+  @media (max-width:1000px) { .wrap { grid-template-columns:1fr; padding:10px 16px 24px; } aside { position:static; max-height:none; } header { padding:16px 16px 8px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>MTS</span> – Momentum Trading System · interactive tour</h1>
+  <p>A custom trading interface built entirely inside Sierra Chart – only with the official ACSIL study interface, no external program, no rebuild of other software.
+  Click a highlighted area to see what it does.</p>
+</header>
+<div class="wrap">
+  <div class="stage pulse" id="stage"><img src="screen.jpg" alt="MTS screenshot in Sierra Chart" id="img"></div>
+  <aside id="panel"></aside>
+</div>
+<footer>Screenshot from Sierra Chart replay, simulated account. Not investment advice. © 2026 chrislb</footer>
+<script>
+// Zwei Ansichten: Hauptbild und Einstellungen. Bereiche in Einheiten der 1600-px-Ansicht.
+const V = { main: { src:'screen.jpg', W:1600, H:851.6 }, set: { src:'settings.jpg', W:1600, H:861.9 } };
+const A = [
+ { id:'intro', t:'Overview', r:null, show:'One chartbook, only own studies: price chart with channel, footprint bar and diagonal delta, an order-flow DOM, an indicator region and – on the right – the Cockpit, a column of tiles that replaces most of the classic dialogs.',
+   why:'Everything a discretionary order-flow trader needs while the market moves, in one place and readable at a glance.',
+   where:'All settings live in the Cockpit drawer (one key per setting, applied instantly). Every tile has a "?" that opens its manual chapter.' },
+ { id:'chart', t:'Price chart', r:[0,62,1235,620], show:'Example: 12-tick range bars – any bar type works. Per bar: <b>yellow dot</b> = 1-bar VWAP (the bar’s centre of gravity), <b>thin cross line</b> = bar POC, <b>red / blue box</b> = POC delta: its height is the volume at the POC, its width the delta. Plus three POC moving averages.',
+   why:'See inside every bar where volume really traded, where its weight sits and who won at the POC – without opening a footprint chart.',
+   where:'Indicators can be switched on and off one by one in the drawer (groups "Indicators").' },
+ { id:'chan', t:'Channel with profile and journal marks', r:[833,276,268,218], show:'A channel marked with two clicks: regression line with ±σ band, label with type, R² and slope in ticks per bar ("Range R2 0.17 +0.5 T/Bar"). On the left its own volume profile with POC (magenta) and value area. Journal events appear as short marks in the chart – here TH (test of the high) and TT (test of the low).',
+   why:'Every range or trend you mark becomes a documented case: what happened, where, with which volume – checkable later in the chart.',
+   where:'Set, browse and annotate in the Channels tile; profile and channel lines can be switched separately.' },
+ { id:'fp', t:'Footprint bar in the chart', r:[1144,220,43,126], show:'Bid | Ask per price level for the live bar (and up to 20 bars next to each other). The diagonally dominant side is coloured, a white frame marks the POC, a gold frame absorption at the extreme, yellow the current price. Header: delta and volume vs. normal; footer: aggression (delta per second) and bar duration.',
+   why:'Read the running bar right where price is – without looking away to a separate footprint chart.',
+   where:'Number of bars with [–] N Bar [+] in the Bar tile, or synchronised with the DOM footprint.' },
+ { id:'diag', t:'Diagonal delta', r:[1187,236,46,110], show:'Next to the bar candle: the diagonal difference Ask[P] – Bid[P–1] per level as bar and number – blue where buyers lift, red where sellers hit.',
+   why:'Shows at which levels the aggressive side really won – the core of reading imbalance.',
+   where:'Colours and on/off in the drawer (group "Numberbar").' },
+ { id:'dom', t:'Order-flow DOM', r:[1293,52,162,633], show:'Book, net change (pulling / stacking), footprint over the last N bars, diagonal delta and time & sales in one ladder. The column order is free (24 layouts), the ask side mirrors the bid side. POC and absorption are framed like in the chart.<br><br><b>Net change – live from the order book, per level:</b><br><code>Net = book now − book at bar start + volume traded at the level</code><br>Adding back what was traded separates real limit changes from fills: <b>+ = stacking</b> (new limits), <b>− = pulling</b> (limits removed). A grey frame means the level changed sides during the bar – net counts only since then.',
+   why:'One ladder instead of three windows – and you see whether liquidity is really there or just being pulled.',
+   where:'Columns, colours and footprint bars in the drawer (group "DOM"); click-trading follows the Trade tile.' },
+ { id:'region', t:'Indicator region', r:[0,686,1235,150], show:'One sub-window for all oscillators: SMI, cumulative delta, DeltaValue candles and more – each one switchable, scaled automatically per group.',
+   why:'No more stack of separate indicator panes and subgraph settings.',
+   where:'Switches per region in the drawer (group "Region").' },
+ { id:'sig', t:'Signal', tag:'preview', r:[1457,55,143,68], show:'Clock, countdown to bar end and a combined direction score from several building blocks.',
+   why:'Shown here only as a preview – it is not part of the first test version.',
+   where:'—' },
+ { id:'trade', t:'Trade tile', r:[1457,124,143,122], show:'SIM / LIVE, quantity, bracket template, attached orders on/off, market / ask / bid buttons, flatten, reverse, cancel, break-even, max position.',
+   why:'All order actions with one click, with clear status of account and position.',
+   where:'Quantity, max position and live permission per market in the drawer (group "Trade").' },
+ { id:'bar', t:'Bar tile', r:[1457,258,143,132], show:'For a window of N bars: volume bid | delta | ask, total vs. average of equal windows (%), aggression, bar time (faster / slower). Below: POC, POC diagonals, POC delta % and POC volume.',
+   why:'Is this bar special? Every number is compared with what is normal right now.',
+   where:'Window size directly in the header: [–] N Bar [+].' },
+ { id:'liqt', t:'Liquidity tile', r:[1457,391,143,58], show:'Net change bid | delta | ask of the running bar (same live calculation as in the DOM), the book of the visible DOM levels and a verdict which side is stacking more.',
+   why:'The liquidity story of the bar in one line.',
+   where:'Colours in the drawer (group "Cockpit: colours").' },
+ { id:'eval', t:'Session stats', r:[1457,451,143,37], show:'Day P/L, number of trades and win rate of the account.', why:'Quick reality check during the session.', where:'—' },
+ { id:'kanal', t:'Channels & journal', r:[1457,489,143,256], show:'Set and delete channels, browse and filter them, switch channel lines and profile. The journal: type (up / range / down), outcome (breakout up / down, false breakout), "recognised at", nine events (test high / low, wall, absorption, distribution, accumulation, weak push, slowed pullback, entry) and notes for the channel and for each event.',
+   why:'Collect your own market situations as cases – the basis for checking your ideas later instead of guessing.',
+   where:'Everything in this tile; events: click the button, then the bar.' },
+ { id:'replay', t:'Replay', r:[1457,765,143,39], show:'Start at the last visible bar, tempo –/+ (0.5 to 200), pause / resume, stop. The standard replay box is hidden.',
+   why:'Practise and review without hunting through menus.',
+   where:'Start tempo and which charts follow (single / all / linked) in the drawer.' },
+ { id:'mts', t:'Settings button', r:[1457,804,143,40], show:'Below the (collapsed) status tile: the "Settings" button. It replaces the tile column with the settings drawer – <b>click it in the picture</b> or press Next.',
+   why:'One compute core calculates every value once; all displays only draw – and all of them are configured in one place.',
+   where:'Click "Settings".', go:'s_drawer' },
+ // --- Einstellungen ---
+ { id:'s_drawer', v:'set', t:'Settings drawer', r:[1457,55,143,745], show:'All settings of all modules in one list, grouped (compute core, indicators, signal, numberbar, DOM, trade, region, channel, cockpit). Groups open and close with a click. No input numbers, no subgraph dialogs – every value has a name, a range and a help text.',
+   why:'Find any setting in seconds – and understand it without a manual.',
+   where:'Stored as readable text per market (e.g. ES.txt) plus one file for the interface; changes apply instantly.' },
+ { id:'s_num', v:'set', t:'Numbers: – value +', r:[1457,93,143,25], show:'Numeric values with – / + (Shift and Ctrl for bigger steps). Click the value itself to type it in.',
+   why:'Fine-tune while watching the chart change.', where:'Every numeric key, e.g. imbalance factor.' },
+ { id:'s_sw', v:'set', t:'Switches and lists', r:[1457,227,143,85], show:'On / off switches (e.g. "bars like DOM", liquidity) and lists with ‹ › (size, reference, position).',
+   why:'Clear choices instead of codes like 0/1/2.', where:'Group "Numberbar: display".' },
+ { id:'s_reset', v:'set', t:'Reset arrow', r:[1584,212,14,170], show:'An arrow appears next to every value that differs from its default – one click resets it.',
+   why:'Experiment freely; the way back is always one click.', where:'Right edge of each row.' },
+ { id:'s_dom', v:'set', t:'Example: DOM display', r:[1457,423,143,120], show:'Display mode (numberbar integrated), footprint bars, column order per side, liquidity on/off, price column, font size, POC frame.',
+   why:'The whole DOM layout in nine rows.', where:'Group "DOM: display".' },
+ { id:'s_help', v:'set', t:'Help line', r:[1457,806,143,44], show:'The help text of the row under the mouse: what it does, the default and the internal key (here SIG_SCHWELLE).',
+   why:'The explanation is where you need it – no separate documentation needed.', where:'Bottom of the drawer.' },
+ { id:'s_close', v:'set', t:'Back to the Cockpit', r:[1583,56,15,13], show:'The × closes the drawer and the tiles return. The lock next to it protects against accidental changes.',
+   why:'', where:'Click × (or "Next" here).', go:'intro' },
+];
+const stage = document.getElementById('stage'), panel = document.getElementById('panel'), img = document.getElementById('img');
+let cur = 0, view = 'main';
+const idx = id => A.findIndex(a => a.id === id);
+function build() {
+  stage.querySelectorAll('.hs').forEach(e => e.remove()); const D = V[view];
+  img.src = D.src;
+  A.forEach((a, i) => { a.el = null; if (!a.r || (a.v || 'main') !== view) return; const [x, y, w, h] = a.r, d = document.createElement('div');
+    d.className = 'hs' + (w > 300 ? ' tip' : ''); d.dataset.t = a.t; d.title = a.t;
+    Object.assign(d.style, { left: x / D.W * 100 + '%', top: y / D.H * 100 + '%', width: w / D.W * 100 + '%', height: h / D.H * 100 + '%' });
+    d.innerHTML = `<i>${i}</i>`; d.onclick = () => (a.go && cur === i) ? show(idx(a.go)) : show(i); stage.appendChild(d); a.el = d; });
+}
+function zoomDiv(a) {
+  if (!a.r) return ''; const D = V[a.v || 'main'], [x, y, w, h] = a.r;
+  const k = Math.min(342 / w, 380 / h, 4), dw = w * k, dh = h * k;
+  return `<div class="zoom" style="height:${dh}px;width:${dw}px;max-width:100%;background-image:url(${D.src});background-size:${D.W * k}px ${D.H * k}px;background-position:${-x * k}px ${-y * k}px"></div>`;
+}
+function show(i) {
+  cur = i; const a = A[i], v = a.v || 'main'; stage.classList.remove('pulse');
+  if (v !== view) { view = v; build(); }
+  A.forEach(b => b.el && b.el.classList.toggle('on', b === a));
+  const nx = a.go ? idx(a.go) : (i + 1) % A.length;
+  panel.innerHTML = `<h2>${a.t}${a.tag ? `<span class="tag">${a.tag}</span>` : ''}</h2>${zoomDiv(a)}
+    <h3>What it shows</h3><p>${a.show}</p>${a.why ? `<h3>Why</h3><p>${a.why}</p>` : ''}<h3>Where to set it</h3><p>${a.where}</p>
+    <div class="nav"><button onclick="show(${(i + A.length - 1) % A.length})">‹ Back</button><span style="color:var(--mut);font-size:13px;align-self:center">${view === 'set' ? 'Settings · ' : ''}${i} / ${A.length - 1}</span><button onclick="show(${nx})">${a.go === 's_drawer' ? 'Open settings ›' : a.go === 'intro' ? 'Back to start ›' : 'Next ›'}</button></div>`;
+  if (window.innerWidth < 1000 && a.r) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') show(A[cur].go ? idx(A[cur].go) : (cur + 1) % A.length); if (e.key === 'ArrowLeft') show((cur + A.length - 1) % A.length); });
+build(); show(0);
+</script>
+</body>
+</html>
