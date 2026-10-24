@@ -13,6 +13,8 @@
   h1 { margin:0; font-size:22px; font-weight:600; letter-spacing:.2px; }
   h1 span { color:var(--acc); }
   header p { margin:4px 0 0; color:var(--mut); max-width:900px; }
+  header p.ai { margin-top:8px; padding:8px 12px; background:var(--pan); border:1px solid var(--line); border-radius:6px; color:#d3d7dc; }
+  header a { color:var(--acc); }
   .wrap { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:16px; padding:10px 20px 30px; max-width:1700px; margin:0 auto; }
   .stage { position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--line); align-self:start; }
   .stage img { display:block; width:100%; height:auto; }
@@ -44,6 +46,9 @@
   <h1><span>MTS</span> – Momentum Trading System · interactive tour</h1>
   <p>A custom trading interface built entirely inside Sierra Chart – only with the official ACSIL study interface, no external program, no rebuild of other software.
   Click a highlighted area to see what it does – including the journal that turns every trade idea into a case.</p>
+  <p class="ai">Questions beyond the tour? Download the <a href="ai-guide.md" download>MTS AI guide</a> (Markdown) and add it to a chat
+  with Claude or another AI assistant – then ask anything about MTS. Or give the assistant this link:
+  <a href="llms.txt">chrislb-trading.github.io/mts-tour/llms.txt</a></p>
 </header>
 <div class="wrap">
   <div class="stage pulse" id="stage"><img src="screen.jpg" alt="MTS screenshot in Sierra Chart" id="img"></div>
@@ -56,7 +61,7 @@ const V = { main: { src:'screen.jpg', W:1600, H:791.9 }, set: { src:'settings.jp
 const A = [
  { id:'intro', t:'Overview', r:null, show:'One chartbook, only own studies: price chart with volume profiles, channels and journal entries, footprint bar and diagonal delta, an order-flow DOM, an indicator region and – on the right – the Cockpit, a column of tiles that replaces most of the classic dialogs.',
    why:'Everything a discretionary order-flow trader needs while the market moves, in one place – and every situation can be recorded as a case to learn from.',
-   where:'All settings live in the Cockpit drawer (one key per setting, applied instantly). Every tile has a "?" that opens its manual chapter.' },
+   where:'All settings live in the Cockpit drawer (one key per setting, applied instantly). Every tile has a "?" that opens its manual chapter. For any other question: the <a href="ai-guide.md" download style="color:var(--acc)">MTS AI guide</a> – add it to a chat with Claude and ask.' },
  { id:'chart', t:'Price chart', r:[0,10,1100,600], show:'Example: 3.5-point range bars – any bar type works. Per bar: <b>yellow dot</b> = 1-bar VWAP (the bar’s centre of gravity), <b>thin cross line</b> = bar POC, <b>red / blue box</b> = POC delta: its height is the volume at the POC, its width the delta. Plus three POC moving averages.',
    why:'See inside every bar where volume really traded, where its weight sits and who won at the POC – without opening a footprint chart.',
    where:'Indicators can be switched on and off one by one in the drawer (groups "Indicators").' },
